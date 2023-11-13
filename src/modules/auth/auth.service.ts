@@ -41,7 +41,7 @@ const AuthenticationService = {
     },
 
     createCookie: (tokenData: TokenData) => {
-        return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
+        return `Authorization=${tokenData.token}; HttpOnly=false; domain=localhost; Max-Age=${tokenData.expiresIn}; SameSite=none`;
     },
 
     createToken: (user: UserEntity): TokenData => {

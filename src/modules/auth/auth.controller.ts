@@ -16,6 +16,12 @@ const AuthController = {
         try {
             const { cookie, data } = await authService.register(userData);
             response.setHeader('Set-Cookie', [cookie]);
+            // res.cookie('token', token, {
+            //     expires: new Date(Date.now() + (3600 * 1000 * 24 * 180 * 1)),
+            //     httpOnly: true,
+            //     sameSite: "none",
+            //     secure: "false",
+            // });
             response.send(data);
         } catch (error) {
             next(error);

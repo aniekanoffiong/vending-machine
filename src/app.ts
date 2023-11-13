@@ -1,9 +1,10 @@
 import express, { Application, Request, NextFunction, Response } from "express";
-import logger from "morgan";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import createError, { HttpError } from "http-errors";
-import routers from "../app/routers"
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import logger from "morgan";
+import routers from "../app/routers";
 
 dotenv.config();
 
@@ -12,6 +13,11 @@ app.use(express.json());
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors({
+    origin: ["http://localhost:5173", process.env.CLIENT_BASE_URL as string],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+    credentials: true,
+}));
 
 app.use('/api' , routers);
 
