@@ -49,8 +49,8 @@ const ProductController = {
             const id = req.params.id as number;
             const productUpdateDto: UpdateProductDto = req.body;
             console.log(`PUT :: Checking request with id ${id} and updateData ${JSON.stringify(productUpdateDto)}`);
-            const result: boolean = await productService.update(id, productUpdateDto);
-            res.send({ message: result ? `Product with id ${id} has been successfully updated` : `Unable to update product with id ${id}`})
+            await productService.update(id, productUpdateDto);
+            res.send(productUpdateDto)
         } catch (error) {
             next(error);
         }

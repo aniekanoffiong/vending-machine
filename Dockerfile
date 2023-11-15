@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:alpine
 
 WORKDIR /vending-machine
 COPY package.json .

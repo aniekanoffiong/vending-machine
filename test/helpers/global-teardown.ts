@@ -1,5 +1,5 @@
 import dockerCompose from "docker-compose";
 
-export default async () => {
+export default async (): Promise<void> => {
     dockerCompose.down();
 };

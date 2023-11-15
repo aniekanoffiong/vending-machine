@@ -7,29 +7,31 @@ import authService from "./auth.service";
 import AuthDto from "./auth.dto";
 import RequestWithUser from "src/interfaces/userRequest.interface";
 import User from "../user/user.interface";
+import { User as UserEntity } from "../user/user.entity";
+import TokenData from "src/interfaces/tokenData.interface";
 
 const AuthController = {
-    register: async (request: Request, response: Response, next: NextFunction) => {
-        const userData: CreateUserDto = request.body;
+    check: async function(req: RequestWithUser, res: Response, _next: NextFunction) {
+        const user = req.user as UserEntity;
+        const authUuid = req.authUuid as string;
+        res.send(await AuthController.sendResponse(user, null, authUuid));
+    },
+
+    register: async (req: Request, res: Response, next: NextFunction) => {
+        const userData: CreateUserDto = req.body;
         const { password, ...rest } = userData;
         console.log(`attempting to create user with data ${JSON.stringify(rest)}`);
         try {
             const { cookie, data } = await authService.register(userData);
-            response.setHeader('Set-Cookie', [cookie]);
-            // res.cookie('token', token, {
-            //     expires: new Date(Date.now() + (3600 * 1000 * 24 * 180 * 1)),
-            //     httpOnly: true,
-            //     sameSite: "none",
-            //     secure: "false",
-            // });
-            response.send(data);
+            res.setHeader('Set-Cookie', [cookie]);
+            res.send(data);
         } catch (error) {
             next(error);
         }
     },
 
-    login: async function(request: Request, response: Response, next: NextFunction) {
-        const logInData: AuthDto = request.body;
+    login: async function(req: Request, res: Response, next: NextFunction) {
+        const logInData: AuthDto = req.body;
         const user = await UserRepository.findOneBy({ username: logInData.username });
         if (user) {
             const isPasswordMatching = await bcrypt.compare(
@@ -38,20 +40,27 @@ const AuthController = {
             );
             if (isPasswordMatching) {
                 const tokenData = authService.createToken(user);
-                let activeLoginData: { activeLogin?: boolean } = {};
-                response.setHeader('Set-Cookie', [authService.createCookie(tokenData)]);
-                if (await authService.existingLoginForUser(user)) {
-                    activeLoginData.activeLogin = true;
-                }
-                await authService.createLoginData(user, tokenData);
-                const { password, ...data } = user;
-                response.send({ ...data, ...activeLoginData });
+                res.setHeader('Set-Cookie', [authService.createCookie(tokenData)]);
+                res.send(await AuthController.sendResponse(user, tokenData, tokenData.uuid))
             } else {
                 next(new WrongCredentialsException());
             }
         } else {
-        next(new WrongCredentialsException());
+            next(new WrongCredentialsException());
         }
+    },
+
+    sendResponse: async function(user: UserEntity, tokenData: TokenData|null, authUuid: string) {
+        let activeLoginData: { activeLogin?: boolean } = {};
+        if (await authService.existingLoginForUser(user, authUuid)) {
+            activeLoginData.activeLogin = true;
+        }
+        if (tokenData) {
+            await authService.createLoginData(user, tokenData);
+        }
+        const { password, ...data } = user;
+        console.log(`checking data for sendResponse data ${JSON.stringify(data)} and activeLoginData ${JSON.stringify(activeLoginData)}`);
+        return { ...data, ...activeLoginData };
     },
 
     logout: (_req: Request, res: Response) => {

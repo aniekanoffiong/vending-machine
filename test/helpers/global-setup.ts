@@ -5,7 +5,7 @@ import dockerCompose from "docker-compose";
 export default async () => {
   console.time('global-setup');
 
-  const isDBReachable = await isPortReachable(54310);
+  const isDBReachable = await isPortReachable(54310, {host: 'localhost'});
   if (!isDBReachable) {
     await dockerCompose.upAll({
       cwd: path.join(__dirname),

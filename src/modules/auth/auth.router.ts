@@ -5,6 +5,12 @@ import authMiddleware from "./auth.middleware";
 const router = express.Router();
 
 router.post(
+    "/auth",
+    authMiddleware,
+    authController.check
+);
+
+router.post(
     '/login',
     authController.login
 );
@@ -13,7 +19,7 @@ router.post(
     '/logout',
     authMiddleware,
     authController.logout
-)
+);
 
 router.post(
     '/logout/all',

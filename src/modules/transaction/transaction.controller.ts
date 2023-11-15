@@ -34,6 +34,7 @@ const UserController = {
             const checkCanBuy: BuyStatusDto = await transactionService.canBuyProducts(buyData, user, product);
             console.log(`retrieved confirmation of canBuy ${JSON.stringify(checkCanBuy)}`);
             if (!checkCanBuy.status) {
+                res.status(422);
                 res.send(checkCanBuy);
             } else {
                 const result: BuyResultDto = await transactionService.buy(buyData, user, product);

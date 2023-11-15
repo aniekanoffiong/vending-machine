@@ -63,8 +63,8 @@ const AuthenticationService = {
         res.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
     },
 
-    existingLoginForUser: async function(user: UserEntity): Promise<boolean> {
-        const activeLogin: ActiveLogin[]|null = await authRepository.findBy({ userId: user.id, isActive: true });
+    existingLoginForUser: async function(user: UserEntity, uuid: string): Promise<boolean> {
+        const activeLogin: ActiveLogin[]|null = await authRepository.findBy({ userId: user.id, uuid: Not(uuid), isActive: true });
         console.log(`Checking for existing login for user ${user.id} returned ${JSON.stringify(activeLogin)}`);
         return activeLogin?.length > 0;
     },

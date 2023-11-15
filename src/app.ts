@@ -14,7 +14,7 @@ app.use(logger("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors({
-    origin: ["http://localhost:5173", process.env.CLIENT_BASE_URL as string],
+    origin: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
     credentials: true,
 }));
