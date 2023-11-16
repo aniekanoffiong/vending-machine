@@ -26,6 +26,7 @@ router.get(
 router.put(
     '/:id',
     authMiddleware,
+    sameUserMiddleware,
     user.put
 );
 
