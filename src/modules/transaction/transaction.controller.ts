@@ -49,7 +49,7 @@ const UserController = {
         try {
             const user = req.user as User;
             const result = await transactionService.performDeposit(user, 0);
-            res.send(result);
+            res.send({message: result.affected && result.affected > 0 ? "Deposit has been reset" : "Unable to reset deposit"});
         } catch (error) {
             next(error);
         }
